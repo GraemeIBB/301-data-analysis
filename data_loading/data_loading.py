@@ -42,13 +42,13 @@ raw_interprov_expenditure['Geography, location of the tourism spending'] = raw_i
 raw_interprov_expenditure['VALUE'] = raw_interprov_expenditure['VALUE'].map(mapToMillions)
 
 # only keep these columns for our cleaned dataframe
-interprov_expenditure = raw_interprov_expenditure[['REF_DATE', 'GEO', 'Geography, location of the tourism spending', 'VALUE']].copy()
+interprovincial_tourist_spending = raw_interprov_expenditure[['REF_DATE', 'GEO', 'Geography, location of the tourism spending', 'VALUE']].copy()
 
 # rename columns
-interprov_expenditure.columns = ['Year', 'Province of Residence', 'Destination Province', 'Amount Spent']
+interprovincial_tourist_spending.columns = ['Year', 'Province of Residence', 'Destination Province', 'Amount Spent']
 
 print("\n------- Cleaned Dataset 1 Preview -------- ")
-print(interprov_expenditure.head())
+print(interprovincial_tourist_spending.head())
 
 
 
@@ -64,6 +64,11 @@ print(interprov_expenditure.head())
 - COORDINATE is not helpful for our purposes
 - DGUID has NA values, however we don't need this
 - Drop totals and make a new DF for this
+- Remove Canada-wide data since it isn't helpful and it likely aggregations of the provincial data
+- Remove territories-wide aggregations
+
+*** NOTE *** 
+This dataset also contains some data for internation spending by region in BC and Ontario. Leaving this in in case we do want to try to look into the BC angle
 
 We end up with two dataframes:
 - totals_foreign_spending (aggregates amount spend by region visited)
@@ -97,6 +102,13 @@ totals_foreign_spending.columns = ['Date', 'Region Visited', 'Expenditure Type',
 
 # remove aggregations from main dataframe
 raw_foreign_spending = raw_foreign_spending.query("`Area of residence` != 'Total, area of residence'").reset_index(drop=True)
+raw_foreign_spending = raw_foreign_spending[~raw_foreign_spending['Type of expenditures'].str.startswith("Total")].reset_index(drop=True)
+
+# remove canada-wide aggregations
+raw_foreign_spending = raw_foreign_spending.query("GEO != 'Canada'").reset_index(drop=True)
+
+# remove territory aggregations
+raw_foreign_spending = raw_foreign_spending.query('GEO != "Yukon, Northwest Territories and Nunavut"')
 
 # remove extra noise from 'Place of Residence' column for improved legibility
 raw_foreign_spending['Area of residence'] = raw_foreign_spending['Area of residence'].map(removeResidents)
@@ -126,6 +138,7 @@ print(foreign_spending.head())
 - Column names are renamed for clarity
 - Values are not mapped to millions due to the numbers being too large to quickly read and understand
 - Products with aggregations of subproducts were filtered out
+- Rows where Expenditure Type contained 'Total', e.g. was an aggregation, were filtered out
 
 We end up with the dataframe:
 - tourism_expenditures 
@@ -269,3 +282,5 @@ tourists_in_canada.columns = ['Date', 'Destination Province', 'Place of Residenc
 
 print("\n------- Cleaned Dataset 4 Preview -------- ")
 print(tourists_in_canada.head())
+
+print(interprovincial_tourist_spending['Year'].dtype)
