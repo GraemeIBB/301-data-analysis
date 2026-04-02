@@ -175,9 +175,15 @@ raw_tourists_in_canada = pd.read_csv("data/tourists_entering_canada/24100050.csv
 # -------- raw_tourists_in_canada cleaning ----------
 """
 - Even though not all values of TERMINATED are NA (meaning the dataseries has been discontinued), we can just keep them for our purposes
+- DECIMALS is always 0, makes sense that we are looking at whole numbers since we are counting visitors
+- 541,773 rows with STATUS == '..' were filtered out. These rows were unusable since StatCan wasn't tracking visitors from those countries during that period
+- Rows where GEO == 'Canada' were filtered out, since we are concerned about the province level and don't want any nation-wide aggregation of provincial data in our dataset
+- Rows where 'Country of residence' was an aggregation, or otherwise not helpful, were filtered out
+- Values of 'Country of residence' are combined under matching names
+- Column names are renamed for clarity
 """
 
-print(raw_tourists_in_canada.head(n = 30))
+print(raw_tourists_in_canada.head())
 
 # count number of values that are NA within each column and compare against data shape
 print(raw_tourists_in_canada.isna().sum())
@@ -230,7 +236,6 @@ def renameCountry(x):
     return x
 
 raw_tourists_in_canada['Country of residence'] = raw_tourists_in_canada['Country of residence'].map(renameCountry).reset_index(drop=True)
-
 
 # make a cleaned dataset
 tourists_in_canada = raw_tourists_in_canada[['REF_DATE', 'GEO', 'Country of residence', 'VALUE']].copy()
