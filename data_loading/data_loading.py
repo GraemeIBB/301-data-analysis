@@ -7,7 +7,7 @@ raw_tourists_in_canada = pd.read_csv("data/tourists_entering_canada/24100050.csv
 
 
 
-# --------- raw_interprov_expenditure cleaning -------
+# --------- raw_interprov_expenditure cleaning (dataset 1) -------
 """
 - All STATUS and SYMBOL column values are NA, meaning there are no flags in this data
 - TERMINATED column values are NA - this is irrelevant to us anyway since we do not need annual updates
@@ -54,7 +54,7 @@ print(interprovincial_tourist_spending.head())
 
 
 
-# ----------- raw_foreign_spending cleaning ------------
+# ----------- raw_foreign_spending cleaning (dataset 2) ------------
 """
 - None of the STATUS colums values are unusuable, therefore we don't need to filter out any rows
 - TERMINATED column values are NA - this is irrelevant to us anyway since we do not need annual updates
@@ -128,7 +128,7 @@ print(foreign_spending.head())
 
 
 
-# ----- Tourism Expenditure Cleaning ------
+# ----- Tourism Expenditure Cleaning (dataset 3) ------
 """
 - We have 2163 rows that have STATUS == '..', which means 'not available'. These rows must be filtered out
 - After filtering out the rows, there are no more NA values for the VALUE column
@@ -171,7 +171,8 @@ raw_tourism_expenditure = raw_tourism_expenditure.query("UOM != 'Percentage'").r
 print(raw_tourism_expenditure.query("UOM == 'Percentage'"))
 
 # filter out rows that are aggregations of other rows
-raw_tourism_expenditure = raw_tourism_expenditure[~raw_tourism_expenditure['Products'].str.startswith("Total")]
+raw_tourism_expenditure = raw_tourism_expenditure[~raw_tourism_expenditure['Products'].str.startswith("Total")].reset_index(drop=True)
+raw_tourism_expenditure = raw_tourism_expenditure[raw_tourism_expenditure['GEO'] != 'Canada'].reset_index(drop=True)
 
 # see all possible values for 'Indicators' column to see how to best name groups for clarity
 print(raw_tourism_expenditure['Indicators'].unique())
@@ -209,7 +210,7 @@ print(tourism_expenditure.head())
 
 
 
-# -------- raw_tourists_in_canada cleaning ----------
+# -------- raw_tourists_in_canada cleaning (dataset 4) ----------
 """
 - Even though not all values of TERMINATED are NA (meaning the dataseries has been discontinued), we can just keep them for our purposes
 - DECIMALS is always 0, makes sense that we are looking at whole numbers since we are counting visitors
