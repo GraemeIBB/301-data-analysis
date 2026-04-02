@@ -47,16 +47,7 @@ interprov_expenditure = raw_interprov_expenditure[['REF_DATE', 'GEO', 'Geography
 # rename columns
 interprov_expenditure.columns = ['Year', 'Province of Residence', 'Destination Province', 'Amount Spent']
 
-# check NA values against dataframe shape
-print(raw_foreign_spending.isna().sum())
-print(raw_foreign_spending.shape)
-
-# ensure that units are what we expect them to be across the whole dataset
-print((raw_foreign_spending['SCALAR_FACTOR'] == 'thousands').sum())
-print((raw_foreign_spending['DECIMALS'] == 0).sum())
-print((raw_foreign_spending['UOM'] == 'Dollars').sum())
-print(raw_foreign_spending['STATUS'].isin(['F', 'x', '...', '..']).sum()) # no flagged values
-
+print("\n------- Cleaned Dataset 1 Preview -------- ")
 print(interprov_expenditure.head())
 
 
@@ -78,6 +69,16 @@ We end up with two dataframes:
 - totals_foreign_spending (aggregates amount spend by region visited)
 - foreign_spending (this is our main dataframe)
 """
+
+# check NA values against dataframe shape
+print("\n", raw_foreign_spending.isna().sum())
+print(raw_foreign_spending.shape)
+
+# ensure that units are what we expect them to be across the whole dataset
+print((raw_foreign_spending['SCALAR_FACTOR'] == 'thousands').sum())
+print((raw_foreign_spending['DECIMALS'] == 0).sum())
+print((raw_foreign_spending['UOM'] == 'Dollars').sum())
+print(raw_foreign_spending['STATUS'].isin(['F', 'x', '...', '..']).sum()) # no flagged values
 
 def removeResidents(x):
     if 'residents' in x:
@@ -109,6 +110,7 @@ foreign_spending = raw_foreign_spending[['REF_DATE', 'GEO', 'Area of residence',
 # rename columns for legibility
 foreign_spending.columns = ['Date', 'Region Visited', 'Place of Residence', 'Expenditure Type', 'Amount Spent']
 
+print("\n------- Cleaned Dataset 2 Preview -------- ")
 print(foreign_spending.head())
 
 
@@ -130,7 +132,7 @@ We end up with the dataframe:
 """
 
 # count NA values across columns and compare against data shape
-print(raw_tourism_expenditure.isna().sum())
+print("\n", raw_tourism_expenditure.isna().sum())
 print(raw_tourism_expenditure.shape)
 
 # ensure that all units are the same across rows
@@ -188,8 +190,8 @@ tourism_expenditure = raw_tourism_expenditure[['REF_DATE', 'GEO', 'Indicators', 
 # rename columns for clarity
 tourism_expenditure.columns = ['Year', 'Province', 'Economic Measure', 'Product', 'Value (Millions)']
 
+print("\n------- Cleaned Dataset 3 Preview -------- ")
 print(tourism_expenditure.head())
-print(tourism_expenditure.shape)
     
 
 
@@ -205,7 +207,7 @@ print(tourism_expenditure.shape)
 - Column names are renamed for clarity
 """
 
-print(raw_tourists_in_canada.head())
+print("\n", raw_tourists_in_canada.head())
 
 # count number of values that are NA within each column and compare against data shape
 print(raw_tourists_in_canada.isna().sum())
@@ -265,4 +267,5 @@ tourists_in_canada = raw_tourists_in_canada[['REF_DATE', 'GEO', 'Country of resi
 # change column names for legibility
 tourists_in_canada.columns = ['Date', 'Destination Province', 'Place of Residence', 'Visitor Count']
 
+print("\n------- Cleaned Dataset 4 Preview -------- ")
 print(tourists_in_canada.head())
