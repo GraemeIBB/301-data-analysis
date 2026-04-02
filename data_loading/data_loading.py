@@ -102,6 +102,8 @@ raw_tourists_in_canada = pd.read_csv("data/tourists_entering_canada/24100050.csv
 - TERMINATED column values are NA - this is irrelevant to us anyway since we do not need annual updates
 - DECIMALS is always 1 since all values are rounded to 1 decimal place
 - Column names are renamed for clarity
+- Values are not mapped to millions due to the numbers being too large to quickly read and understand
+- Products with aggregations of subproducts were filtered out
 
 We end up with the dataframe:
 - tourism_expenditures 
@@ -125,12 +127,46 @@ print(raw_tourism_expenditure['STATUS'].unique())
 print(raw_tourism_expenditure['UOM'].unique())
 
 # filter out rows with flags
-raw_tourism_expenditure = raw_tourism_expenditure.query("STATUS != '..'")
+raw_tourism_expenditure = raw_tourism_expenditure.query("STATUS != '..'").reset_index(drop=True)
 print(raw_tourism_expenditure.isna().sum())
 
-# filter our rows in 'UOM' that aren't 'Dollars'
-raw_tourism_expenditure = raw_tourism_expenditure.query("UOM != 'Percentage'")
+# filter our rows in 'UOM' that aren't 'Dollars' ('Percentage' was a value in for 'Indicators' == 'Tourism product ration')
+raw_tourism_expenditure = raw_tourism_expenditure.query("UOM != 'Percentage'").reset_index(drop=True)
 print(raw_tourism_expenditure.query("UOM == 'Percentage'"))
 
-# see all possible values for 'Indicator' column to see how to best name groups for clarity
+# filter out rows that are aggregations of other rows
+raw_tourism_expenditure = raw_tourism_expenditure[~raw_tourism_expenditure['Products'].str.startswith("Total")]
+
+# see all possible values for 'Indicators' column to see how to best name groups for clarity
 print(raw_tourism_expenditure['Indicators'].unique())
+
+# filter out rows where 'Indicators' == 'total demand', 'exports', or 'imports' since these are aggregation of existing values in the dataset
+raw_tourism_expenditure = raw_tourism_expenditure.query("(Indicators != 'Total demand') & (Indicators != 'Exports') & (Indicators != 'Imports')")
+
+# rename remaining columns
+def renameIndicator(x):
+    if x == 'Total domestic supply':
+        return 'Total local supply'
+    elif x == 'Domestic demand':
+        return 'Local spending'
+    elif x == 'Interprovincial demand (exports)':
+        return 'Domestic visitor spending'
+    elif x == 'International imports':
+        return 'Sourced from abroad'
+    elif x == 'International demand (exports)':
+        return 'Foreign visitor spending'
+    elif x == 'Interprovincial imports':
+        return 'Sourced from other provinces'
+    return x
+
+raw_tourism_expenditure['Indicators'] = raw_tourism_expenditure['Indicators'].map(renameIndicator);
+
+# new dataframe with clean data
+tourism_expenditure = raw_tourism_expenditure[['REF_DATE', 'GEO', 'Indicators', 'Products', 'VALUE']]
+
+# rename columns for clarity
+tourism_expenditure.columns = ['Year', 'Province', 'Economic Measure', 'Product', 'Value (Millions)']
+
+print(tourism_expenditure.head())
+print(tourism_expenditure.shape)
+    
