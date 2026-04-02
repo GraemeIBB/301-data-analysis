@@ -68,7 +68,12 @@ def insert_into_table3(cursor, df3):
 
 def insert_into_table4(cursor, df4):
     table4_insert = "INSERT INTO provincial_visitor_count VALUES (%s, %s, %s, %s)"
+    split_size = 1000
     rows = [tuple(row) for row in df4.itertuples(index=False)]
-    cursor.executemany(table4_insert, rows)
+
+    for i in range(0, len(rows), split_size):
+        split = rows[i : i + split_size]
+        cursor.executemany(table4_insert, split)
+    
     print(f"Inserted {cursor.rowcount} rows")
 
