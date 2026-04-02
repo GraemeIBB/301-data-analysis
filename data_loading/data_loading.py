@@ -92,3 +92,45 @@ raw_tourists_in_canada = pd.read_csv("data/tourists_entering_canada/24100050.csv
 # foreign_spending.columns = ['Date', 'Region Visited', 'Place of Residence', 'Expenditure Type', 'Amount Spent']
 
 # print(foreign_spending.head())
+
+
+# ----- Tourism Expenditure Cleaning ------
+"""
+- We have 2163 rows that have STATUS == '..', which means 'not available'. These rows must be filtered out
+- After filtering out the rows, there are no more NA values for the VALUE column
+- All remaining STATUS and SYMBOL column values are NA, meaning there are no more flags in this data
+- TERMINATED column values are NA - this is irrelevant to us anyway since we do not need annual updates
+- DECIMALS is always 1 since all values are rounded to 1 decimal place
+- Column names are renamed for clarity
+
+We end up with the dataframe:
+- tourism_expenditures 
+"""
+# count NA values across columns and compare against data shape
+print(raw_tourism_expenditure.isna().sum())
+print(raw_tourism_expenditure.shape)
+
+# ensure that all units are the same across rows
+print((raw_tourism_expenditure['SCALAR_FACTOR'] == 'millions').sum())
+print((raw_tourism_expenditure['DECIMALS'] == 1).sum())
+print((raw_tourism_expenditure['UOM'] == 'Dollars').sum())
+
+# check if there is any unusable data
+print(raw_tourism_expenditure['STATUS'].isin(['F', 'x', '...', '..']).sum())
+
+# see which flag values are in 'STATUS' so we can filter them out
+print(raw_tourism_expenditure['STATUS'].unique())
+
+# see what other values of 'UOM' there are besides 'Dollars' so we can filter them out
+print(raw_tourism_expenditure['UOM'].unique())
+
+# filter out rows with flags
+raw_tourism_expenditure = raw_tourism_expenditure.query("STATUS != '..'")
+print(raw_tourism_expenditure.isna().sum())
+
+# filter our rows in 'UOM' that aren't 'Dollars'
+raw_tourism_expenditure = raw_tourism_expenditure.query("UOM != 'Percentage'")
+print(raw_tourism_expenditure.query("UOM == 'Percentage'"))
+
+# see all possible values for 'Indicator' column to see how to best name groups for clarity
+print(raw_tourism_expenditure['Indicators'].unique())
