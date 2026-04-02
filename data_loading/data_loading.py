@@ -45,7 +45,7 @@ raw_interprov_expenditure['VALUE'] = raw_interprov_expenditure['VALUE'].map(mapT
 interprovincial_tourist_spending = raw_interprov_expenditure[['REF_DATE', 'GEO', 'Geography, location of the tourism spending', 'VALUE']].copy()
 
 # rename columns
-interprovincial_tourist_spending.columns = ['Year', 'Province of Residence', 'Destination Province', 'Amount Spent']
+interprovincial_tourist_spending.columns = ['year', 'province_of_residence', 'destination_province', 'amount_spent']
 
 print("\n------- Cleaned Dataset 1 Preview -------- ")
 print(interprovincial_tourist_spending.head())
@@ -120,7 +120,7 @@ raw_foreign_spending['VALUE'] = raw_foreign_spending['VALUE'].map(mapToThousands
 foreign_spending = raw_foreign_spending[['REF_DATE', 'GEO', 'Area of residence', 'Type of expenditures', 'VALUE']].copy()
 
 # rename columns for legibility
-foreign_spending.columns = ['Date', 'Region Visited', 'Place of Residence', 'Expenditure Type', 'Amount Spent']
+foreign_spending.columns = ['date', 'region_visited', 'place_of_residence', 'expenditure_type', 'amount_spent']
 
 print("\n------- Cleaned Dataset 2 Preview -------- ")
 print(foreign_spending.head())
@@ -202,7 +202,7 @@ raw_tourism_expenditure['Indicators'] = raw_tourism_expenditure['Indicators'].ma
 tourism_expenditure = raw_tourism_expenditure[['REF_DATE', 'GEO', 'Indicators', 'Products', 'VALUE']].copy()
 
 # rename columns for clarity
-tourism_expenditure.columns = ['Year', 'Province', 'Economic Measure', 'Product', 'Value (Millions)']
+tourism_expenditure.columns = ['year', 'province', 'economic_measure', 'product', 'value_in_millions']
 
 print("\n------- Cleaned Dataset 3 Preview -------- ")
 print(tourism_expenditure.head())
@@ -276,12 +276,12 @@ def renameCountry(x):
 raw_tourists_in_canada['Country of residence'] = raw_tourists_in_canada['Country of residence'].map(renameCountry).reset_index(drop=True)
 
 # make a cleaned dataset
-tourists_in_canada = raw_tourists_in_canada[['REF_DATE', 'GEO', 'Country of residence', 'VALUE']].copy()
+provincial_visitor_count = raw_tourists_in_canada[['REF_DATE', 'GEO', 'Country of residence', 'VALUE']].copy()
 
 # change column names for legibility
-tourists_in_canada.columns = ['Date', 'Destination Province', 'Place of Residence', 'Visitor Count']
+provincial_visitor_count.columns = ['date', 'destination_province', 'place_of_residence', 'visitor_count']
 
 print("\n------- Cleaned Dataset 4 Preview -------- ")
-print(tourists_in_canada.head())
+print(provincial_visitor_count.head())
 
-print(interprovincial_tourist_spending['Year'].dtype)
+print(provincial_visitor_count['visitor_count'].max())

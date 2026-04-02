@@ -24,6 +24,17 @@ create_table2_statement = 'CREATE TABLE IF NOT EXISTS international_tourist_spen
 
 cursor.execute(create_table2_statement)
 
+create_table3_statement = 'CREATE TABLE IF NOT EXISTS tourism_supply_demand ' \
+'(year SMALLINT, province VARCHAR(60), economic_measure VARCHAR(60),' \
+'product VARCHAR(80), value_in_millions DECIMAL(15,1))'
+
+cursor.execute(create_table3_statement)
+
+create_table4_statement = 'CREATE TABLE IF NOT EXISTS provincial_visitor_count ' \
+'(date VARCHAR(10), destination_province VARCHAR(60), place_of_residence VARCHAR(60),' \
+'visitor_count INT)'
+
+cursor.execute(create_table4_statement)
 
 cursor.execute('SHOW TABLES')
 
