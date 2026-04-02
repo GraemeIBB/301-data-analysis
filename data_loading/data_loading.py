@@ -94,79 +94,124 @@ raw_tourists_in_canada = pd.read_csv("data/tourists_entering_canada/24100050.csv
 # print(foreign_spending.head())
 
 
-# ----- Tourism Expenditure Cleaning ------
-"""
-- We have 2163 rows that have STATUS == '..', which means 'not available'. These rows must be filtered out
-- After filtering out the rows, there are no more NA values for the VALUE column
-- All remaining STATUS and SYMBOL column values are NA, meaning there are no more flags in this data
-- TERMINATED column values are NA - this is irrelevant to us anyway since we do not need annual updates
-- DECIMALS is always 1 since all values are rounded to 1 decimal place
-- Column names are renamed for clarity
-- Values are not mapped to millions due to the numbers being too large to quickly read and understand
-- Products with aggregations of subproducts were filtered out
+# # ----- Tourism Expenditure Cleaning ------
+# """
+# - We have 2163 rows that have STATUS == '..', which means 'not available'. These rows must be filtered out
+# - After filtering out the rows, there are no more NA values for the VALUE column
+# - All remaining STATUS and SYMBOL column values are NA, meaning there are no more flags in this data
+# - TERMINATED column values are NA - this is irrelevant to us anyway since we do not need annual updates
+# - DECIMALS is always 1 since all values are rounded to 1 decimal place
+# - Column names are renamed for clarity
+# - Values are not mapped to millions due to the numbers being too large to quickly read and understand
+# - Products with aggregations of subproducts were filtered out
 
-We end up with the dataframe:
-- tourism_expenditures 
+# We end up with the dataframe:
+# - tourism_expenditures 
+# """
+
+# # count NA values across columns and compare against data shape
+# print(raw_tourism_expenditure.isna().sum())
+# print(raw_tourism_expenditure.shape)
+
+# # ensure that all units are the same across rows
+# print((raw_tourism_expenditure['SCALAR_FACTOR'] == 'millions').sum())
+# print((raw_tourism_expenditure['DECIMALS'] == 1).sum())
+# print((raw_tourism_expenditure['UOM'] == 'Dollars').sum())
+
+# # check if there is any unusable data
+# print(raw_tourism_expenditure['STATUS'].isin(['F', 'x', '...', '..']).sum())
+
+# # see which flag values are in 'STATUS' so we can filter them out
+# print(raw_tourism_expenditure['STATUS'].unique())
+
+# # see what other values of 'UOM' there are besides 'Dollars' so we can filter them out
+# print(raw_tourism_expenditure['UOM'].unique())
+
+# # filter out rows with flags
+# raw_tourism_expenditure = raw_tourism_expenditure.query("STATUS != '..'").reset_index(drop=True)
+# print(raw_tourism_expenditure.isna().sum())
+
+# # filter our rows in 'UOM' that aren't 'Dollars' ('Percentage' was the other value in 'UOM' - seen where Indicators == 'Tourism product ratio')
+# raw_tourism_expenditure = raw_tourism_expenditure.query("UOM != 'Percentage'").reset_index(drop=True)
+# print(raw_tourism_expenditure.query("UOM == 'Percentage'"))
+
+# # filter out rows that are aggregations of other rows
+# raw_tourism_expenditure = raw_tourism_expenditure[~raw_tourism_expenditure['Products'].str.startswith("Total")]
+
+# # see all possible values for 'Indicators' column to see how to best name groups for clarity
+# print(raw_tourism_expenditure['Indicators'].unique())
+
+# # filter out rows where 'Indicators' == 'total demand', 'exports', or 'imports' since these are aggregation of existing values in the dataset
+# raw_tourism_expenditure = raw_tourism_expenditure.query("(Indicators != 'Total demand') & (Indicators != 'Exports') & (Indicators != 'Imports')")
+
+# # rename remaining Indicators column values
+# def renameIndicator(x):
+#     if x == 'Total domestic supply':
+#         return 'Total local supply'
+#     elif x == 'Domestic demand':
+#         return 'Local spending'
+#     elif x == 'Interprovincial demand (exports)':
+#         return 'Domestic visitor spending'
+#     elif x == 'International imports':
+#         return 'Sourced from abroad'
+#     elif x == 'International demand (exports)':
+#         return 'Foreign visitor spending'
+#     elif x == 'Interprovincial imports':
+#         return 'Sourced from other provinces'
+#     return x
+
+# raw_tourism_expenditure['Indicators'] = raw_tourism_expenditure['Indicators'].map(renameIndicator);
+
+# # new dataframe with clean data
+# tourism_expenditure = raw_tourism_expenditure[['REF_DATE', 'GEO', 'Indicators', 'Products', 'VALUE']]
+
+# # rename columns for clarity
+# tourism_expenditure.columns = ['Year', 'Province', 'Economic Measure', 'Product', 'Value (Millions)']
+
+# print(tourism_expenditure.head())
+# print(tourism_expenditure.shape)
+    
+
+# -------- raw_tourists_in_canada cleaning ----------
 """
-# count NA values across columns and compare against data shape
-print(raw_tourism_expenditure.isna().sum())
-print(raw_tourism_expenditure.shape)
+- Even though not all values of TERMINATED are NA (meaning the dataseries has been discontinued), we can just keep them for our purposes
+"""
+# count number of values that are NA within each column and compare against data shape
+print(raw_tourists_in_canada.isna().sum())
+print(raw_tourists_in_canada.shape)
 
 # ensure that all units are the same across rows
-print((raw_tourism_expenditure['SCALAR_FACTOR'] == 'millions').sum())
-print((raw_tourism_expenditure['DECIMALS'] == 1).sum())
-print((raw_tourism_expenditure['UOM'] == 'Dollars').sum())
+print((raw_tourists_in_canada['SCALAR_FACTOR'] == 'units').sum())
+print((raw_tourists_in_canada['DECIMALS'] == 0).sum())
+print((raw_tourists_in_canada['UOM'] == 'Visitors').sum())
 
 # check if there is any unusable data
-print(raw_tourism_expenditure['STATUS'].isin(['F', 'x', '...', '..']).sum())
+print(raw_tourists_in_canada['STATUS'].isin(['F', 'x', '...', '..']).sum())
 
 # see which flag values are in 'STATUS' so we can filter them out
-print(raw_tourism_expenditure['STATUS'].unique())
+print(raw_tourists_in_canada['STATUS'].unique())
 
-# see what other values of 'UOM' there are besides 'Dollars' so we can filter them out
-print(raw_tourism_expenditure['UOM'].unique())
+# filter out rows with flags (rows with STATUS == '..')
+raw_tourists_in_canada = raw_tourists_in_canada.query("STATUS != '..'").reset_index(drop=True)
+print(raw_tourists_in_canada.isna().sum())
 
-# filter out rows with flags
-raw_tourism_expenditure = raw_tourism_expenditure.query("STATUS != '..'").reset_index(drop=True)
-print(raw_tourism_expenditure.isna().sum())
+# see what values of 'Country of residence' there are
+print(raw_tourists_in_canada['Country of residence'].unique())
 
-# filter our rows in 'UOM' that aren't 'Dollars' ('Percentage' was a value in for 'Indicators' == 'Tourism product ration')
-raw_tourism_expenditure = raw_tourism_expenditure.query("UOM != 'Percentage'").reset_index(drop=True)
-print(raw_tourism_expenditure.query("UOM == 'Percentage'"))
-
-# filter out rows that are aggregations of other rows
-raw_tourism_expenditure = raw_tourism_expenditure[~raw_tourism_expenditure['Products'].str.startswith("Total")]
-
-# see all possible values for 'Indicators' column to see how to best name groups for clarity
-print(raw_tourism_expenditure['Indicators'].unique())
-
-# filter out rows where 'Indicators' == 'total demand', 'exports', or 'imports' since these are aggregation of existing values in the dataset
-raw_tourism_expenditure = raw_tourism_expenditure.query("(Indicators != 'Total demand') & (Indicators != 'Exports') & (Indicators != 'Imports')")
-
-# rename remaining columns
-def renameIndicator(x):
-    if x == 'Total domestic supply':
-        return 'Total local supply'
-    elif x == 'Domestic demand':
-        return 'Local spending'
-    elif x == 'Interprovincial demand (exports)':
-        return 'Domestic visitor spending'
-    elif x == 'International imports':
-        return 'Sourced from abroad'
-    elif x == 'International demand (exports)':
-        return 'Foreign visitor spending'
-    elif x == 'Interprovincial imports':
-        return 'Sourced from other provinces'
+# rename 'Country of residence' column value for American visitors
+def renameCountry(x):
+    if x == 'United States of America residents entering Canada':
+        return 'United States'
+    if x == 'Americas, countries other than the United States of America':
+        return 'Americas, n.o.s.'
     return x
 
-raw_tourism_expenditure['Indicators'] = raw_tourism_expenditure['Indicators'].map(renameIndicator);
+raw_tourists_in_canada['Country of residence'] = raw_tourists_in_canada['Country of residence'].map(renameCountry)
 
-# new dataframe with clean data
-tourism_expenditure = raw_tourism_expenditure[['REF_DATE', 'GEO', 'Indicators', 'Products', 'VALUE']]
+# filter out 'Country of residence' column values that are aggregations and not helpful
+exclude = ['Non-resident visitors entering Canada', 'Residents of countries other than the United States of America entering Canada']
 
-# rename columns for clarity
-tourism_expenditure.columns = ['Year', 'Province', 'Economic Measure', 'Product', 'Value (Millions)']
+raw_tourists_in_canada = raw_tourists_in_canada[~raw_tourists_in_canada['Country of residence'].isin(exclude)]
 
-print(tourism_expenditure.head())
-print(tourism_expenditure.shape)
-    
+for x in raw_tourists_in_canada['Country of residence'].unique():
+    print(x)
