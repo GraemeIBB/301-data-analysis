@@ -20,8 +20,8 @@ def main():
     cnx = connect_db()
     cursor = cnx.cursor()
 
-    drop_tables('interprovincial_tourist_spending', 'international_tourist_spending', 
-                'tourism_supply_demand', 'provincial_visitor_count', cursor)
+    # drop_tables('interprovincial_tourist_spending', 'international_tourist_spending', 
+    #             'tourism_supply_demand', 'provincial_visitor_count', cursor)
     
     create_tables(cursor)
 
