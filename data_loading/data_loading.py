@@ -38,19 +38,57 @@ raw_tourists_in_canada = pd.read_csv("data/tourists_entering_canada/24100050.csv
 
 # interprov_expenditure.columns = ['Year', 'Province of Origin', 'Destination Province', 'Amount Spent']
 
-print(raw_foreign_spending.isna().sum())
-print(raw_foreign_spending.shape)
+# print(raw_foreign_spending.isna().sum())
+# print(raw_foreign_spending.shape)
 
-print((raw_foreign_spending['SCALAR_FACTOR'] == 'thousands').sum())
-print((raw_foreign_spending['DECIMALS'] == 0).sum())
-print(raw_foreign_spending['STATUS'].isin(['F', 'x', '...', '..']).sum())
+# print((raw_foreign_spending['SCALAR_FACTOR'] == 'thousands').sum())
+# print((raw_foreign_spending['DECIMALS'] == 0).sum())
+# print((raw_foreign_spending['UOM'] == 'Dollars').sum())
+# print(raw_foreign_spending['STATUS'].isin(['F', 'x', '...', '..']).sum())
 
-"""
-- None of the STATUS colums values are unusuable, therefore we don't need to filter out any rows
-- TERMINATED column values are NA - this is irrelevant to us anyway since we do not need annual updates
-- DECIMALS is always 0 since all values are rounded to whole numbers
-- UOM_ID is StatCan's code for "Dollars", and UOM is always Dollars
-- SCALAR_ID is the code for "Thousands", and SCALAR_FACTOR is always "thousands"
-- COORDINATE is not helpful for our purposes
-- DGUID has NA values, however we don't need this
-"""
+# """
+# - None of the STATUS colums values are unusuable, therefore we don't need to filter out any rows
+# - TERMINATED column values are NA - this is irrelevant to us anyway since we do not need annual updates
+# - DECIMALS is always 0 since all values are rounded to whole numbers
+# - UOM_ID is StatCan's code for "Dollars", and UOM is always Dollars
+# - SCALAR_ID is the code for "Thousands", and SCALAR_FACTOR is always "thousands"
+# - COORDINATE is not helpful for our purposes
+# - DGUID has NA values, however we don't need this
+# - Drop totals and make a new DF for this
+
+# We end up with two dataframes:
+# - totals_foreign_spending (aggregates amount spend by region visited)
+# - foreign_spending (this is our main dataframe)
+# """
+
+# def removeResidents(x):
+#     if 'residents' in x:
+#         return x.replace('residents', '')
+#     return x
+    
+# def mapToThousands(x):
+#     return x * 1000
+
+# # keep aggregations of tourist origins as a separate dataframe
+# query = "`Area of residence` == 'Total, area of residence'"
+# raw_totals_foreign_spending = pd.DataFrame(raw_foreign_spending.query(query)).reset_index(drop=True)
+# raw_totals_foreign_spending['VALUE'] = raw_totals_foreign_spending['VALUE'].map(mapToThousands)
+# totals_foreign_spending = raw_totals_foreign_spending[['REF_DATE', 'GEO', 'Type of expenditures', 'VALUE']].copy()
+# totals_foreign_spending.columns = ['Date', 'Region Visited', 'Expenditure Type', 'Amount Spent']
+
+# # remove aggregations from main dataframe
+# raw_foreign_spending = raw_foreign_spending.query("`Area of residence` != 'Total, area of residence'").reset_index(drop=True)
+
+# # remove extra noise from 'Place of Residence' column for improved legibility
+# raw_foreign_spending['Area of residence'] = raw_foreign_spending['Area of residence'].map(removeResidents)
+
+# # map amount spent to thousands
+# raw_foreign_spending['VALUE'] = raw_foreign_spending['VALUE'].map(mapToThousands)
+
+# # new dataframe keeping only columns we want
+# foreign_spending = raw_foreign_spending[['REF_DATE', 'GEO', 'Area of residence', 'Type of expenditures', 'VALUE']].copy()
+
+# # rename columns for legibility
+# foreign_spending.columns = ['Date', 'Region Visited', 'Place of Residence', 'Expenditure Type', 'Amount Spent']
+
+# print(foreign_spending.head())
