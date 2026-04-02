@@ -195,23 +195,41 @@ print(raw_tourists_in_canada['STATUS'].unique())
 raw_tourists_in_canada = raw_tourists_in_canada.query("STATUS != '..'").reset_index(drop=True)
 print(raw_tourists_in_canada.isna().sum())
 
+# filter out when the region is 'Canada' since we are concerned about the province level
+raw_tourists_in_canada = raw_tourists_in_canada.query("GEO != 'Canada'").reset_index(drop=True)
+
 # see what values of 'Country of residence' there are
 print(raw_tourists_in_canada['Country of residence'].unique())
 
-# rename 'Country of residence' column value for American visitors
+# filter out 'Country of residence' column values that are aggregations and not helpful
+exclude = ['Non-resident visitors entering Canada', 
+           'Residents of countries other than the United States of America entering Canada',
+           'Americas, countries other than the United States of America',
+           'North America, countries other than the United States of America',]
+
+conditions = (raw_tourists_in_canada['Country of residence'].isin(exclude) | raw_tourists_in_canada['Country of residence'].str.contains('n.o.s', na = False))
+raw_tourists_in_canada = raw_tourists_in_canada[~conditions]
+
+# rename 'Country of residence' column values, OR filter our aggregations or column values that are not helpful
 def renameCountry(x):
     if x == 'United States of America residents entering Canada':
         return 'United States'
-    if x == 'Americas, countries other than the United States of America':
-        return 'Americas, n.o.s.'
+    if x == 'Germany, Federal Republic of':
+        return 'Germany'
+    if x == 'Saint Martin (French part)' or x == 'Sint Maarten (Dutch part)':
+        return 'Saint Martin'
+    if 'Antarctica' in x:
+        return 'Antarctica'
+    if 'Virgin Islands' in x:
+        return 'Virgin Islands'
+    if 'Congo,' in x:
+        return 'Democratic Republic of the Congo'
     return x
 
 raw_tourists_in_canada['Country of residence'] = raw_tourists_in_canada['Country of residence'].map(renameCountry)
 
-# filter out 'Country of residence' column values that are aggregations and not helpful
-exclude = ['Non-resident visitors entering Canada', 'Residents of countries other than the United States of America entering Canada']
 
-raw_tourists_in_canada = raw_tourists_in_canada[~raw_tourists_in_canada['Country of residence'].isin(exclude)]
 
-for x in raw_tourists_in_canada['Country of residence'].unique():
-    print(x)
+
+# # make a cleaned dataset
+# tourists_in_canada = raw_tourists_in_canada[['REF_DATE', 'GEO', ]]
