@@ -36,7 +36,7 @@ raw_tourists_in_canada = pd.read_csv("data/tourists_entering_canada/24100050.csv
 
 # interprov_expenditure = raw_interprov_expenditure[['REF_DATE', 'GEO', 'Geography, location of the tourism spending', 'VALUE']].copy()
 
-# interprov_expenditure.columns = ['Year', 'Province of Origin', 'Destination Province', 'Amount Spent']
+# interprov_expenditure.columns = ['Year', 'Province of Residence', 'Destination Province', 'Amount Spent']
 
 # print(raw_foreign_spending.isna().sum())
 # print(raw_foreign_spending.shape)
@@ -163,7 +163,7 @@ raw_tourists_in_canada = pd.read_csv("data/tourists_entering_canada/24100050.csv
 # raw_tourism_expenditure['Indicators'] = raw_tourism_expenditure['Indicators'].map(renameIndicator);
 
 # # new dataframe with clean data
-# tourism_expenditure = raw_tourism_expenditure[['REF_DATE', 'GEO', 'Indicators', 'Products', 'VALUE']]
+# tourism_expenditure = raw_tourism_expenditure[['REF_DATE', 'GEO', 'Indicators', 'Products', 'VALUE']].copy()
 
 # # rename columns for clarity
 # tourism_expenditure.columns = ['Year', 'Province', 'Economic Measure', 'Product', 'Value (Millions)']
@@ -176,6 +176,9 @@ raw_tourists_in_canada = pd.read_csv("data/tourists_entering_canada/24100050.csv
 """
 - Even though not all values of TERMINATED are NA (meaning the dataseries has been discontinued), we can just keep them for our purposes
 """
+
+print(raw_tourists_in_canada.head(n = 30))
+
 # count number of values that are NA within each column and compare against data shape
 print(raw_tourists_in_canada.isna().sum())
 print(raw_tourists_in_canada.shape)
@@ -208,7 +211,7 @@ exclude = ['Non-resident visitors entering Canada',
            'North America, countries other than the United States of America',]
 
 conditions = (raw_tourists_in_canada['Country of residence'].isin(exclude) | raw_tourists_in_canada['Country of residence'].str.contains('n.o.s', na = False))
-raw_tourists_in_canada = raw_tourists_in_canada[~conditions]
+raw_tourists_in_canada = raw_tourists_in_canada[~conditions].reset_index(drop=True)
 
 # rename 'Country of residence' column values, OR filter our aggregations or column values that are not helpful
 def renameCountry(x):
@@ -226,10 +229,13 @@ def renameCountry(x):
         return 'Democratic Republic of the Congo'
     return x
 
-raw_tourists_in_canada['Country of residence'] = raw_tourists_in_canada['Country of residence'].map(renameCountry)
+raw_tourists_in_canada['Country of residence'] = raw_tourists_in_canada['Country of residence'].map(renameCountry).reset_index(drop=True)
 
 
+# make a cleaned dataset
+tourists_in_canada = raw_tourists_in_canada[['REF_DATE', 'GEO', 'Country of residence', 'VALUE']].copy()
 
+# change column names for legibility
+tourists_in_canada.columns = ['Date', 'Destination Province', 'Place of Residence', 'Visitor Count']
 
-# # make a cleaned dataset
-# tourists_in_canada = raw_tourists_in_canada[['REF_DATE', 'GEO', ]]
+print(tourists_in_canada.head())
