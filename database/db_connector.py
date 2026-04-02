@@ -1,6 +1,14 @@
 import mysql.connector
+from dotenv import load_dotenv
+import os
 
-cnx = mysql.connector.connect(user='root', password='12345', host='localhost')
+load_dotenv()
+
+cnx = mysql.connector.connect(user=os.getenv('DB_USER'), password=os.getenv('PASSWORD'), host=os.getenv('HOST'))
 cursor = cnx.cursor()
 
-print("Connected to db")
+print("Connected to AWS db")
+
+cursor.execute(f"CREATE DATABASE IF NOT EXISTS `{os.getenv('DB_NAME')}`")
+cursor.execute(f"USE `{os.getenv('DB_NAME')}`")
+
