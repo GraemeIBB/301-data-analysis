@@ -5,47 +5,60 @@ raw_foreign_spending = pd.read_csv("data/spending_by_foreign_tourists/24100047.c
 raw_tourism_expenditure = pd.read_csv("data/tourism_supply_expenditure/24100004.csv")
 raw_tourists_in_canada = pd.read_csv("data/tourists_entering_canada/24100050.csv", dtype={'STATUS': str, 'TERMINATED': str})
 
-# # --------- Cleaning of raw_interprov_expenditure -------
-# print(raw_interprov_expenditure.isna().sum())
-# print((raw_interprov_expenditure['SCALAR_FACTOR'] == 'millions').sum())
-# print((raw_interprov_expenditure['DECIMALS'] == 0).sum())
+# --------- raw_interprov_expenditure cleaning -------
+print(raw_interprov_expenditure.isna().sum())
+print((raw_interprov_expenditure['SCALAR_FACTOR'] == 'millions').sum())
+print((raw_interprov_expenditure['DECIMALS'] == 0).sum())
 
-# """
-# - All STATUS and SYMBOL column values are NA, meaning there are no flags in this data
-# - TERMINATED column values are NA - this is irrelevant to us anyway since we do not need annual updates
-# - DECIMALS is always 1 since all values are rounded to 1 decimal place
-# - UOM_ID is StatCan's code for "Dollars", and UOM is always Dollars
-# - SCALAR_ID is the code for "Millions", and SCALAR_FACTOR is always millions
-# - COORDINATE is not helpful for our purposes
-# """
+"""
+- All STATUS and SYMBOL column values are NA, meaning there are no flags in this data
+- TERMINATED column values are NA - this is irrelevant to us anyway since we do not need annual updates
+- DECIMALS is always 1 since all values are rounded to 1 decimal place
+- UOM_ID is StatCan's code for "Dollars", and UOM is always Dollars
+- SCALAR_ID is the code for "Millions", and SCALAR_FACTOR is always millions
+- COORDINATE is not helpful for our purposes
+"""
 
-# def splitValues(x):
-#     split = x.split(',')
-#     return split[0]
+def splitValues(x):
+    split = x.split(',')
+    return split[0]
 
-# def spendingSplitValues(x):
-#     split = x.split(' in ')
-#     return split[1]
+def spendingSplitValues(x):
+    split = x.split(' in ')
+    return split[1]
 
-# def mapToMillions(x):
-#     return x * 1000000
+def mapToMillions(x):
+    return x * 1000000
 
-# raw_interprov_expenditure['GEO'] = raw_interprov_expenditure['GEO'].map(splitValues)
-# raw_interprov_expenditure['Geography, location of the tourism spending'] = raw_interprov_expenditure['Geography, location of the tourism spending'].map(spendingSplitValues)
-# raw_interprov_expenditure['VALUE'] = raw_interprov_expenditure['VALUE'].map(mapToMillions)
+# removing 'residence; from GEO (province of origin) for clarity
+raw_interprov_expenditure['GEO'] = raw_interprov_expenditure['GEO'].map(splitValues)
 
-# interprov_expenditure = raw_interprov_expenditure[['REF_DATE', 'GEO', 'Geography, location of the tourism spending', 'VALUE']].copy()
+# removing 'Spending in' from 'Geography, location of the tourism spending' column - so we are just left with province names
+raw_interprov_expenditure['Geography, location of the tourism spending'] = raw_interprov_expenditure['Geography, location of the tourism spending'].map(spendingSplitValues)
 
-# interprov_expenditure.columns = ['Year', 'Province of Residence', 'Destination Province', 'Amount Spent']
+# mapping values to their proper units (millions)
+raw_interprov_expenditure['VALUE'] = raw_interprov_expenditure['VALUE'].map(mapToMillions)
 
-# print(raw_foreign_spending.isna().sum())
-# print(raw_foreign_spending.shape)
+# only keep these columns for our cleaned dataframe
+interprov_expenditure = raw_interprov_expenditure[['REF_DATE', 'GEO', 'Geography, location of the tourism spending', 'VALUE']].copy()
 
-# print((raw_foreign_spending['SCALAR_FACTOR'] == 'thousands').sum())
-# print((raw_foreign_spending['DECIMALS'] == 0).sum())
-# print((raw_foreign_spending['UOM'] == 'Dollars').sum())
-# print(raw_foreign_spending['STATUS'].isin(['F', 'x', '...', '..']).sum())
+# rename columns
+interprov_expenditure.columns = ['Year', 'Province of Residence', 'Destination Province', 'Amount Spent']
 
+# check NA values against dataframe shape
+print(raw_foreign_spending.isna().sum())
+print(raw_foreign_spending.shape)
+
+# ensure that units are what we expect them to be across the whole dataset
+print((raw_foreign_spending['SCALAR_FACTOR'] == 'thousands').sum())
+print((raw_foreign_spending['DECIMALS'] == 0).sum())
+print((raw_foreign_spending['UOM'] == 'Dollars').sum())
+print(raw_foreign_spending['STATUS'].isin(['F', 'x', '...', '..']).sum()) # no flagged values
+
+print(interprov_expenditure.head())
+
+
+# # ----------- raw_foreign_spending cleaning ------------
 # """
 # - None of the STATUS colums values are unusuable, therefore we don't need to filter out any rows
 # - TERMINATED column values are NA - this is irrelevant to us anyway since we do not need annual updates
@@ -172,75 +185,75 @@ raw_tourists_in_canada = pd.read_csv("data/tourists_entering_canada/24100050.csv
 # print(tourism_expenditure.shape)
     
 
-# -------- raw_tourists_in_canada cleaning ----------
-"""
-- Even though not all values of TERMINATED are NA (meaning the dataseries has been discontinued), we can just keep them for our purposes
-- DECIMALS is always 0, makes sense that we are looking at whole numbers since we are counting visitors
-- 541,773 rows with STATUS == '..' were filtered out. These rows were unusable since StatCan wasn't tracking visitors from those countries during that period
-- Rows where GEO == 'Canada' were filtered out, since we are concerned about the province level and don't want any nation-wide aggregation of provincial data in our dataset
-- Rows where 'Country of residence' was an aggregation, or otherwise not helpful, were filtered out
-- Values of 'Country of residence' are combined under matching names
-- Column names are renamed for clarity
-"""
+# # -------- raw_tourists_in_canada cleaning ----------
+# """
+# - Even though not all values of TERMINATED are NA (meaning the dataseries has been discontinued), we can just keep them for our purposes
+# - DECIMALS is always 0, makes sense that we are looking at whole numbers since we are counting visitors
+# - 541,773 rows with STATUS == '..' were filtered out. These rows were unusable since StatCan wasn't tracking visitors from those countries during that period
+# - Rows where GEO == 'Canada' were filtered out, since we are concerned about the province level and don't want any nation-wide aggregation of provincial data in our dataset
+# - Rows where 'Country of residence' was an aggregation, or otherwise not helpful, were filtered out
+# - Values of 'Country of residence' are combined under matching names
+# - Column names are renamed for clarity
+# """
 
-print(raw_tourists_in_canada.head())
+# print(raw_tourists_in_canada.head())
 
-# count number of values that are NA within each column and compare against data shape
-print(raw_tourists_in_canada.isna().sum())
-print(raw_tourists_in_canada.shape)
+# # count number of values that are NA within each column and compare against data shape
+# print(raw_tourists_in_canada.isna().sum())
+# print(raw_tourists_in_canada.shape)
 
-# ensure that all units are the same across rows
-print((raw_tourists_in_canada['SCALAR_FACTOR'] == 'units').sum())
-print((raw_tourists_in_canada['DECIMALS'] == 0).sum())
-print((raw_tourists_in_canada['UOM'] == 'Visitors').sum())
+# # ensure that all units are the same across rows
+# print((raw_tourists_in_canada['SCALAR_FACTOR'] == 'units').sum())
+# print((raw_tourists_in_canada['DECIMALS'] == 0).sum())
+# print((raw_tourists_in_canada['UOM'] == 'Visitors').sum())
 
-# check if there is any unusable data
-print(raw_tourists_in_canada['STATUS'].isin(['F', 'x', '...', '..']).sum())
+# # check if there is any unusable data
+# print(raw_tourists_in_canada['STATUS'].isin(['F', 'x', '...', '..']).sum())
 
-# see which flag values are in 'STATUS' so we can filter them out
-print(raw_tourists_in_canada['STATUS'].unique())
+# # see which flag values are in 'STATUS' so we can filter them out
+# print(raw_tourists_in_canada['STATUS'].unique())
 
-# filter out rows with flags (rows with STATUS == '..')
-raw_tourists_in_canada = raw_tourists_in_canada.query("STATUS != '..'").reset_index(drop=True)
-print(raw_tourists_in_canada.isna().sum())
+# # filter out rows with flags (rows with STATUS == '..')
+# raw_tourists_in_canada = raw_tourists_in_canada.query("STATUS != '..'").reset_index(drop=True)
+# print(raw_tourists_in_canada.isna().sum())
 
-# filter out when the region is 'Canada' since we are concerned about the province level
-raw_tourists_in_canada = raw_tourists_in_canada.query("GEO != 'Canada'").reset_index(drop=True)
+# # filter out when the region is 'Canada' since we are concerned about the province level
+# raw_tourists_in_canada = raw_tourists_in_canada.query("GEO != 'Canada'").reset_index(drop=True)
 
-# see what values of 'Country of residence' there are
-print(raw_tourists_in_canada['Country of residence'].unique())
+# # see what values of 'Country of residence' there are
+# print(raw_tourists_in_canada['Country of residence'].unique())
 
-# filter out 'Country of residence' column values that are aggregations and not helpful
-exclude = ['Non-resident visitors entering Canada', 
-           'Residents of countries other than the United States of America entering Canada',
-           'Americas, countries other than the United States of America',
-           'North America, countries other than the United States of America',]
+# # filter out 'Country of residence' column values that are aggregations and not helpful
+# exclude = ['Non-resident visitors entering Canada', 
+#            'Residents of countries other than the United States of America entering Canada',
+#            'Americas, countries other than the United States of America',
+#            'North America, countries other than the United States of America',]
 
-conditions = (raw_tourists_in_canada['Country of residence'].isin(exclude) | raw_tourists_in_canada['Country of residence'].str.contains('n.o.s', na = False))
-raw_tourists_in_canada = raw_tourists_in_canada[~conditions].reset_index(drop=True)
+# conditions = (raw_tourists_in_canada['Country of residence'].isin(exclude) | raw_tourists_in_canada['Country of residence'].str.contains('n.o.s', na = False))
+# raw_tourists_in_canada = raw_tourists_in_canada[~conditions].reset_index(drop=True)
 
-# rename 'Country of residence' column values, OR filter our aggregations or column values that are not helpful
-def renameCountry(x):
-    if x == 'United States of America residents entering Canada':
-        return 'United States'
-    if x == 'Germany, Federal Republic of':
-        return 'Germany'
-    if x == 'Saint Martin (French part)' or x == 'Sint Maarten (Dutch part)':
-        return 'Saint Martin'
-    if 'Antarctica' in x:
-        return 'Antarctica'
-    if 'Virgin Islands' in x:
-        return 'Virgin Islands'
-    if 'Congo,' in x:
-        return 'Democratic Republic of the Congo'
-    return x
+# # rename 'Country of residence' column values, OR filter our aggregations or column values that are not helpful
+# def renameCountry(x):
+#     if x == 'United States of America residents entering Canada':
+#         return 'United States'
+#     if x == 'Germany, Federal Republic of':
+#         return 'Germany'
+#     if x == 'Saint Martin (French part)' or x == 'Sint Maarten (Dutch part)':
+#         return 'Saint Martin'
+#     if 'Antarctica' in x:
+#         return 'Antarctica'
+#     if 'Virgin Islands' in x:
+#         return 'Virgin Islands'
+#     if 'Congo,' in x:
+#         return 'Democratic Republic of the Congo'
+#     return x
 
-raw_tourists_in_canada['Country of residence'] = raw_tourists_in_canada['Country of residence'].map(renameCountry).reset_index(drop=True)
+# raw_tourists_in_canada['Country of residence'] = raw_tourists_in_canada['Country of residence'].map(renameCountry).reset_index(drop=True)
 
-# make a cleaned dataset
-tourists_in_canada = raw_tourists_in_canada[['REF_DATE', 'GEO', 'Country of residence', 'VALUE']].copy()
+# # make a cleaned dataset
+# tourists_in_canada = raw_tourists_in_canada[['REF_DATE', 'GEO', 'Country of residence', 'VALUE']].copy()
 
-# change column names for legibility
-tourists_in_canada.columns = ['Date', 'Destination Province', 'Place of Residence', 'Visitor Count']
+# # change column names for legibility
+# tourists_in_canada.columns = ['Date', 'Destination Province', 'Place of Residence', 'Visitor Count']
 
-print(tourists_in_canada.head())
+# print(tourists_in_canada.head())
