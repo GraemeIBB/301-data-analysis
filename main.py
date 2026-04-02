@@ -20,7 +20,9 @@ def main():
     cnx = connect_db()
     cursor = cnx.cursor()
 
-    # drop_tables('interprovincial_tourist_spending', 'international_tourist_spending', 'tourism_supply_demand', 'provincial_visitor_count', cursor)
+    drop_tables('interprovincial_tourist_spending', 'international_tourist_spending', 
+                'tourism_supply_demand', 'provincial_visitor_count', cursor)
+    
     create_tables(cursor)
 
     if is_empty('interprovincial_tourist_spending', cursor):
@@ -41,6 +43,18 @@ def main():
     for row in cursor.fetchall():
         print(row)
 
+    cursor.execute("SELECT * FROM tourism_supply_demand LIMIT 10")
+    for row in cursor.fetchall():
+        print(row)
+
+    
+    cursor.execute("SELECT * FROM international_tourist_spending LIMIT 10")
+    for row in cursor.fetchall():
+        print(row)
+
+    cursor.execute("SELECT * FROM interprovincial_tourist_spending LIMIT 10")
+    for row in cursor.fetchall():
+        print(row)
     
     cursor.close()
     cnx.close()
