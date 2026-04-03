@@ -113,7 +113,7 @@ def load_and_clean_dataset2():
     raw_foreign_spending = raw_foreign_spending.query('GEO != "Yukon, Northwest Territories and Nunavut"')
 
     # remove extra noise from 'Place of Residence' column for improved legibility
-    raw_foreign_spending['Area of residence'] = raw_foreign_spending['Area of residence'].map(removeResidents)
+    raw_foreign_spending['Area of residence'] = raw_foreign_spending['Area of residence'].map(removeResidents).str.strip()
 
     # map amount spent to thousands
     raw_foreign_spending['VALUE'] = raw_foreign_spending['VALUE'].map(mapToThousands)
