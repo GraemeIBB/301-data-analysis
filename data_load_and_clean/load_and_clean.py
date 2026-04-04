@@ -264,7 +264,19 @@ def load_and_clean_dataset4():
     exclude = ['Non-resident visitors entering Canada', 
             'Residents of countries other than the United States of America entering Canada',
             'Americas, countries other than the United States of America',
-            'North America, countries other than the United States of America',]
+            'North America, countries other than the United States of America',
+            # Continental
+            'Africa', 'Asia', 'Europe', 'Oceania',
+            # Sub-regional
+            'Central America', 'Caribbean', 'South America',
+            'Western Europe', 'Central/Eastern Europe', 'Northern Europe',
+            'Southern Europe', 'East Mediterranean Europe',
+            'Western Africa', 'Eastern Africa', 'Northern Africa',
+            'Central Africa', 'Southern Africa',
+            'Middle East', 'Northeast Asia', 'Southeast Asia', 'Southern Asia',
+            'Australasia', 'Melanesia', 'Micronesia', 'Polynesia',
+            'Antarctica and Adjacent Islands', 'Antarctica and Adjacent Islands Region',
+            ]
 
     conditions = (raw_tourists_in_canada['Country of residence'].isin(exclude) | raw_tourists_in_canada['Country of residence'].str.contains('n.o.s', na = False))
     raw_tourists_in_canada = raw_tourists_in_canada[~conditions].reset_index(drop=True)
