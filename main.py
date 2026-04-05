@@ -1,7 +1,7 @@
 from data_load_and_clean.load_and_clean import load_and_clean_dataset1, load_and_clean_dataset2, load_and_clean_dataset3, load_and_clean_dataset4
 from database.db_connector import connect_db, create_tables, insert_into_table1, insert_into_table2, insert_into_table3, insert_into_table4, drop_tables
 
-from analysis.eda.spend_per_arrival_eda import run_eda
+from analysis.spend_per_arrival_analysis import QuestionTwo
 
 def is_empty(table, cursor):
     sql = f"SELECT * FROM {table} LIMIT 10"
@@ -41,7 +41,11 @@ def main():
 
     cnx.commit()
 
-    run_eda()
+    # Run Q2 analysis
+    q2 = QuestionTwo()
+    q2.answer()
+    q2.shift()
+
 
     cursor.execute("SELECT * FROM provincial_visitor_count LIMIT 10")
     for row in cursor.fetchall():
