@@ -1,5 +1,7 @@
 import pandas as pd
+import numpy as np
 from scipy import stats
+import matplotlib.pyplot as plt
 
 def predict_quarterly_international_tourist_arrivals(cursor):
     sql = """
@@ -13,7 +15,7 @@ def predict_quarterly_international_tourist_arrivals(cursor):
     WHEN its.region_visited LIKE '%Quebec%' THEN 'Quebec'
     ELSE its.region_visited
     END
-    GROUP BY pvc.date, pvc.destination_province LIMIT 10
+    GROUP BY pvc.date, pvc.destination_province
     """
     
     cursor.execute(sql)
@@ -21,7 +23,21 @@ def predict_quarterly_international_tourist_arrivals(cursor):
     total_international_tourist_spend = []
 
     rows = cursor.fetchall()
-    visitor_count_by_month.append(int(row[2]) for row in rows)
-    total_international_tourist_spend.append(float(row[3]) for row in rows)
+    visitor_count_by_month.append([int(row[2]) for row in rows])
+    total_international_tourist_spend.append([float(row[3]) for row in rows])
 
-    
+    slope, intercept, r_value, p_value, std_err = stats.linregress(total_international_tourist_spend, visitor_count_by_month)
+
+    y_predicted = [(slope * x) + intercept for x in total_international_tourist_spend]
+    residuals = [actual - pred for actual, pred in zip(visitor_count_by_month, y_predicted)]
+    mse = np.mean([r**2 for r in residuals])
+
+    print(f"\nPredicted formula: y = {slope}x + {intercept}")
+    print(f"Y values: {[y for y in y_predicted[:10]]}")
+    print(f"Prediction Error: {mse}")
+    print(f"Residual errors: {[r for r in residuals[:10]]}")
+
+    ax = plt.gca()
+    ax.scatter(total_international_tourist_spend, visitor_count_by_month)
+    ax.plot(total_international_tourist_spend, y_predicted, color="red")
+    plt.show()
