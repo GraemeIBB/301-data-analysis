@@ -4,4 +4,5 @@
 /database/__pycache__
 /analysis/eda/__pycache__
 analysis/eda/outputs/
+analysis/outputs/
 venv/
