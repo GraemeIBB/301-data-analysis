@@ -18,7 +18,7 @@
 | Province-level spending rows | 12,365 | 100% |
 | After excluding Overseas / Other countries | 9,656 | 78.1% |
 | After excluding NULL or zero arrivals | 5,968 | 48.3% |
-| After excluding < 50 quarterly arrivals | 4,989 | 40.3% |
+| After excluding < 20 quarterly arrivals | 5434 | 43.9% |
 
 The 50-arrival threshold was added after observing a $433,093 spend_per_arrival outlier caused by low-volume origin-province pairs within otherwise reliable provinces. Province-name flagging alone does not catch these.
 
@@ -27,7 +27,7 @@ The 50-arrival threshold was added after observing a $433,093 spend_per_arrival 
 | Province | Pre-COVID spend/arrival | Reason flagged |
 |---|---|---|
 | Prince Edward Island | $7,831 | Very low international volumes |
-| Nunavut | $1,453 | Very low international volumes |
+| Nunavut | $1,004 | Very low international volumes |
 | Northwest Territories | suppressed | Majority of counts suppressed by StatCan |
 | Yukon | $100 | Very low international volumes |
 
@@ -37,8 +37,8 @@ Included in outputs, flagged via `low_reliability` column.
 
 | | amount_spent | spend_per_arrival | quarterly_arrivals |
 |---|---|---|---|
-| Mean | $11.9M | $1,657 | 120,284 |
-| Median | $1.3M | $277 | 5,407 |
+| Mean | $11.0M | $2,241 | 110,437 |
+| Median | $981.5K | $328 | 4,025 |
 | Max | $625.1M | $433,093 | 4,855,171 |
 
 Large mean/median gap across all three metrics confirms heavy right skew driven by US arrivals into Ontario and BC.

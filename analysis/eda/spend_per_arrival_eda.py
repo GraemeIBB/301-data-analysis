@@ -21,7 +21,7 @@ EXCLUDE_ORIGINS = {
     'Other countries',
 }
 
-MIN_QUARTERLY_ARRIVALS = 50
+MIN_QUARTERLY_ARRIVALS = 20
 
 QUERY_SPENDING = text("""
     SELECT date, region_visited, place_of_residence, expenditure_type, amount_spent
