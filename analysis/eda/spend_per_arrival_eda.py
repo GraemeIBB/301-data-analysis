@@ -105,18 +105,11 @@ def run_eda():
     )
 
     null_report.to_csv(os.path.join(OUTPUT_DIR, 'eda_null_report.csv'), index=False)
-    print(null_report.to_string(index=False))
     zero_spend = df_joined[
         (df_joined['quarterly_arrivals'].notna()) & 
         (df_joined['amount_spent'] == 0)
     ]
-    print(f"Rows with arrivals but zero spend: {len(zero_spend)}")
 
-    zero_arrivals_nonnull = df_joined[
-        (df_joined['quarterly_arrivals'] == 0) &
-        df_joined['spend_per_arrival'].isna()
-    ]
-    print(f"Rows with zero arrivals (not null) and null spend_per_arrival: {len(zero_arrivals_nonnull)}")
     # 2. Coverage report
     total_rows = len(df_spending)
 
@@ -153,8 +146,6 @@ def run_eda():
         100.0 * coverage['row_count'] / total_rows
     ).round(1)
 
-    print("\n--- Q2 Data Coverage ---")
-    print(coverage.to_string(index=False))
     coverage.to_csv(os.path.join(OUTPUT_DIR, 'eda_spend_coverage.csv'), index=False)
 
     # 3. Summary statistics
@@ -164,8 +155,6 @@ def run_eda():
         'quarterly_arrivals': df_usable['quarterly_arrivals'].describe(),
     })
 
-    print("\n--- Summary Statistics ---")
-    print(summary.to_string())
     summary.to_csv(os.path.join(OUTPUT_DIR, 'eda_spend_summary_stats.csv'))
 
     pre_covid = df_usable[~df_usable['covid_period']]
@@ -362,8 +351,7 @@ def run_eda():
     plt.tight_layout()
     _save(fig, 'eda_volume_vs_spend.png')
 
-    print("\nQ2 EDA complete. Outputs written to analysis/outputs/")
-
+    print("EDA completed. Outputs saved to: ", OUTPUT_DIR)
 
 if __name__ == "__main__":
     run_eda()
