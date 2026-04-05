@@ -42,7 +42,7 @@ def predict_quarterly_international_tourist_arrivals(cursor):
     plt.title("International Tourist Count vs. Tourist Expenditure by Province")
     plt.xlabel("Spend in Dollars")
     plt.ylabel("Visitor Count")
-    plt.show(block=False)
+    plt.show()
 
 
 
@@ -86,4 +86,4 @@ def predict_spend_per_arrival(cursor):
     plt.title("Spend per Arrival vs. Total Arrivals")
     plt.xlabel("Total Arrivals")
     plt.ylabel("Spend per Arrival in Dollars")
-    plt.show(block=False)
+    plt.show()
