@@ -1,8 +1,6 @@
 import numpy as np
 from scipy import stats
 import matplotlib.pyplot as plt
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error, r2_score
 
 def predict_quarterly_international_tourist_arrivals(cursor):
     sql = """
@@ -44,7 +42,7 @@ def predict_quarterly_international_tourist_arrivals(cursor):
     plt.title("International Tourist Count vs. Tourist Expenditure by Province")
     plt.xlabel("Spend in Dollars")
     plt.ylabel("Visitor Count")
-    plt.show()
+    plt.show(block=False)
 
 
 
@@ -88,4 +86,4 @@ def predict_spend_per_arrival(cursor):
     plt.title("Spend per Arrival vs. Total Arrivals")
     plt.xlabel("Total Arrivals")
     plt.ylabel("Spend per Arrival in Dollars")
-    plt.show()
+    plt.show(block=False)

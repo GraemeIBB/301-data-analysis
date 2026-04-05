@@ -58,7 +58,7 @@ def main():
     #     print(row)
 
     
-    # predict_quarterly_international_tourist_arrivals(cursor)
+    predict_quarterly_international_tourist_arrivals(cursor)
     predict_spend_per_arrival(cursor)
 
     

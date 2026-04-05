@@ -2,6 +2,5 @@ pandas
 mysql-connector-python
 python-dotenv
 matplotlib
-scikit-learn
 numpy
 scipy
