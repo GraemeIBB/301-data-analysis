@@ -2,3 +2,8 @@
 .env
 /data_load_and_clean/__pycache__
 /database/__pycache__
+
+#for test generated csvs
+analysis/*.csv
+
+venv/
