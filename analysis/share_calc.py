@@ -5,6 +5,8 @@ import os
 
 
 class QuestionOne:
+    """International Arrivals Share of inbound visitors"""
+
     def __init__(self) -> None:
 
         load_dotenv()
@@ -42,14 +44,21 @@ class QuestionOne:
         elif p == "year":
             df["period"] = df["period"].str[:4]  # 1990-01 -> 1990
 
+        df = df.rename(columns={"place_of_residence": "origin"})
+
         if p != "month":
-            df = df.groupby(["period", "place_of_residence"], as_index=False)[
-                "arrivals"
-            ].sum()
+            df = df.groupby(["period", "origin"], as_index=False)["arrivals"].sum()
+
         # share: each arrival / sum of all arrivals in that period. transform > groupby().sum()
         df["share"] = df["arrivals"] / df.groupby("period")["arrivals"].transform("sum")
         # period_number: ranks by sequential ints eg 1990-01 < 1990-02
         df["period_number"] = df["period"].rank(method="dense").astype(int)
+
+        # convenience columns derived from period
+        df["year"] = df["period"].str[:4].astype(int)
+        if p == "quarter":
+            df["quarter"] = df["period"].str[-1].astype(int)
+
         df = df.sort_values(["period", "share"], ascending=[True, False]).reset_index(
             drop=True
         )
