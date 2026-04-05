@@ -24,7 +24,7 @@ def predict_quarterly_international_tourist_arrivals(cursor):
     visitor_count_by_month = [int(row[2]) for row in rows]
     total_international_tourist_spend = [float(row[3]) for row in rows]
 
-    slope, intercept = stats.linregress(total_international_tourist_spend, visitor_count_by_month)
+    slope, intercept, r_value, p_value, std_err = stats.linregress(total_international_tourist_spend, visitor_count_by_month)
 
     y_predicted = [(slope * x) + intercept for x in total_international_tourist_spend]
     residuals = [actual - pred for actual, pred in zip(visitor_count_by_month, y_predicted)]
@@ -38,7 +38,7 @@ def predict_quarterly_international_tourist_arrivals(cursor):
     ax = plt.gca()
     ax.scatter(total_international_tourist_spend, visitor_count_by_month)
     ax.plot(total_international_tourist_spend, y_predicted, color="red")
-    plt.title("International Tourist Arrivals by Province per Month")
-    plt.xlabel("Total International Tourist Spend by Province per Month (Dollars)")
-    plt.ylabel("International Visitor Count by Province per Month")
+    plt.title("International Tourist Count vs. Tourist Expenditure by Province")
+    plt.xlabel("Spend in Dollars")
+    plt.ylabel("Visitor Count")
     plt.show()
