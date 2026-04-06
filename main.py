@@ -3,6 +3,9 @@ from database.db_connector import connect_db, create_tables, insert_into_table1,
 from regression import predict_quarterly_international_tourist_arrivals
 from regression2 import predict_spend_per_arrival
 
+from analysis.eda.spend_per_arrival_eda import run_eda
+from analysis.spend_per_arrival_analysis import QuestionTwo
+
 def is_empty(table, cursor):
     sql = f"SELECT * FROM {table} LIMIT 10"
     cursor.execute(sql)
@@ -41,9 +44,16 @@ def main():
 
     # cnx.commit()
 
-    # cursor.execute("SELECT * FROM provincial_visitor_count LIMIT 10")
-    # for row in cursor.fetchall():
-    #     print(row)
+    # Run Q2 analysis
+    run_eda()
+    q2 = QuestionTwo()
+    q2.answer()
+    q2.shift()
+
+
+    cursor.execute("SELECT * FROM provincial_visitor_count LIMIT 10")
+    for row in cursor.fetchall():
+        print(row)
 
     # cursor.execute("SELECT * FROM tourism_supply_demand LIMIT 10")
     # for row in cursor.fetchall():
