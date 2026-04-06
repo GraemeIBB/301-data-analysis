@@ -1,7 +1,6 @@
 from data_load_and_clean.load_and_clean import load_and_clean_dataset1, load_and_clean_dataset2, load_and_clean_dataset3, load_and_clean_dataset4
 from database.db_connector import connect_db, create_tables, insert_into_table1, insert_into_table2, insert_into_table3, insert_into_table4, drop_tables
-from regression import predict_quarterly_international_tourist_arrivals
-from regression2 import predict_spend_per_arrival
+from analysis.regression.regression import predict_quarterly_international_tourist_arrivals
 
 from analysis.eda.spend_per_arrival_eda import run_eda
 from analysis.spend_per_arrival_analysis import QuestionTwo
@@ -70,7 +69,6 @@ def main():
 
     
     predict_quarterly_international_tourist_arrivals(cursor)
-    predict_spend_per_arrival(cursor)
 
     
     cursor.close()
