@@ -20,7 +20,7 @@
 | After excluding NULL or zero arrivals | 5,968 | 48.3% |
 | After excluding < 20 quarterly arrivals | 5434 | 43.9% |
 
-The 50-arrival threshold was added after observing a $433,093 spend_per_arrival outlier caused by low-volume origin-province pairs within otherwise reliable provinces. Province-name flagging alone does not catch these.
+The 20-arrival threshold was added after observing a $433,093 spend_per_arrival outlier caused by low-volume origin-province pairs within otherwise reliable provinces. Province-name flagging alone does not catch these.
 
 ## Province Reliability
 

@@ -7,7 +7,7 @@ from sqlalchemy import create_engine, text
 from dotenv import load_dotenv
 
 
-OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'outputs', 'eda')
+OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'outputs')
 
 LOW_RELIABILITY_PROVINCES = {
     'Prince Edward Island',
