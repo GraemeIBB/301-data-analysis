@@ -1,8 +1,7 @@
 /data
 .env
 **/__pycache__/
-analysis/eda/outputs/
-
+**/outputs/
 #for test generated csvs
 analysis/*.csv
 
