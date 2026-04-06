@@ -18,3 +18,6 @@
 An interactive dashboard visualising spend per arrival by province, origin country, and season is available on Tableau Public:
 [View Dashboard](https://public.tableau.com/shared/YF24NH29R?:display_count=n&:origin=viz_share_link)
 
+#### Link to Video Presentation
+You can find our team's presentation on this analysis below! Thank you for taking the time to visit this analysis, and please reach out with any questions. 
+[View Presentation Here](https://drive.google.com/drive/folders/1THvb3yLjlaMj1EZPGsMvX7cordN7Ys_7?usp=sharing)
