@@ -2,5 +2,8 @@
 .env
 **/__pycache__/
 analysis/eda/outputs/
-analysis/outputs/
+
+#for test generated csvs
+analysis/*.csv
+
 venv/
