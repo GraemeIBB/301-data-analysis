@@ -14,3 +14,7 @@
 - In the terminal, run `pip install -r requirements.txt`.
 - run the python file `main.py`
 
+#### Tableau Dashboard
+An interactive dashboard visualising spend per arrival by province, origin country, and season is available on Tableau Public:
+[View Dashboard](https://public.tableau.com/shared/YF24NH29R?:display_count=n&:origin=viz_share_link)
+
