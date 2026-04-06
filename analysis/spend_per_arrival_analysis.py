@@ -9,7 +9,7 @@ OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'outputs')
 LOW_RELIABILITY_PROVINCES = {
     'Prince Edward Island', 'Nunavut', 'Northwest Territories', 'Yukon',
 }
-EXCLUDE_ORIGINS    = {'Overseas', 'Other countries'}
+EXCLUDE_ORIGINS    = {'Other countries'}
 MIN_ARRIVALS       = 20
 PRE_COVID_YEARS    = (2018, 2019)
 POST_COVID_YEARS   = (2022, 2023)
@@ -61,7 +61,11 @@ class QuestionTwo:
 
         df['origin'] = df['origin'].replace({'South Korea': 'Korea, South'})
         df = df[~df['origin'].isin(EXCLUDE_ORIGINS)]
-        df = df[df['quarterly_arrivals'].fillna(0) >= MIN_ARRIVALS].reset_index(drop=True)
+        df = df[~df['province'].str.startswith('Rest of ', na=False)]
+        df = df[
+            (df['quarterly_arrivals'].fillna(0) >= MIN_ARRIVALS) |
+            (df['quarterly_arrivals'].isna() & (df['origin'] == 'Overseas'))
+            ].reset_index(drop=True)
 
         df['year']            = df['year'].astype(int)
         df['quarter']         = df['quarter'].astype(int)
@@ -84,12 +88,6 @@ class QuestionTwo:
         return df
 
     def shift(self) -> pd.DataFrame:
-        """
-        Pre vs post COVID comparison of spend per arrival per province/origin.
-        Note: post-COVID visitor counts are suppressed for all non-US origins
-        by StatCan, so meaningful shift results are limited to United States.
-        All other origins will appear as NaN in post_covid columns.
-        """
         df = self._fetch(PRE_COVID_YEARS[0], POST_COVID_YEARS[1])
         df = df[~df['covid_period']]
 
@@ -97,17 +95,29 @@ class QuestionTwo:
             return (
                 df[df['year'].between(*years)]
                 .groupby(['province', 'origin', 'low_reliability'], as_index=False)
-                .apply(lambda g: pd.Series({
-                    'spend_per_arrival': g['total_spend'].sum() / g['quarterly_arrivals'].sum()
-                }), include_groups=False)
+                .agg(
+                    total_spend=('total_spend', 'sum'),
+                    total_arrivals=('quarterly_arrivals', 'sum'),
+                )
+                .assign(spend_per_arrival=lambda x: x['total_spend'] / x['total_arrivals'])
+                [['province', 'origin', 'low_reliability', 'total_spend', 'spend_per_arrival']]
             )
 
-        pre  = _agg(PRE_COVID_YEARS).rename(columns={'spend_per_arrival': 'pre_covid'})
-        post = _agg(POST_COVID_YEARS).rename(columns={'spend_per_arrival': 'post_covid'})
+        pre  = _agg(PRE_COVID_YEARS).rename(columns={
+            'spend_per_arrival': 'pre_covid_spa',
+            'total_spend':       'pre_covid_spend'
+        })
+        post = _agg(POST_COVID_YEARS).rename(columns={
+            'spend_per_arrival': 'post_covid_spa',
+            'total_spend':       'post_covid_spend'
+        })
 
         result = pre.merge(post, on=['province', 'origin', 'low_reliability'], how='outer')
-        result['absolute_change'] = result['post_covid'] - result['pre_covid']
-        result['pct_change']      = (100 * result['absolute_change'] / result['pre_covid']).round(2)
+
+        result['spa_absolute_change']   = result['post_covid_spa']   - result['pre_covid_spa']
+        result['spa_pct_change']        = (100 * result['spa_absolute_change']   / result['pre_covid_spa']).round(2)
+        result['spend_absolute_change'] = result['post_covid_spend'] - result['pre_covid_spend']
+        result['spend_pct_change']      = (100 * result['spend_absolute_change'] / result['pre_covid_spend']).round(2)
 
         os.makedirs(OUTPUT_DIR, exist_ok=True)
         out = os.path.join(OUTPUT_DIR, 'spend_per_arrival_shift.csv')
