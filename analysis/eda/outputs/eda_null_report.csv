@@ -1,0 +1,16 @@
+column,null_count,null_pct,table
+date,0,0.0,international_tourist_spending
+region_visited,0,0.0,international_tourist_spending
+place_of_residence,0,0.0,international_tourist_spending
+expenditure_type,0,0.0,international_tourist_spending
+amount_spent,0,0.0,international_tourist_spending
+date,0,0.0,joined
+province,0,0.0,joined
+origin,0,0.0,joined
+expenditure_type,0,0.0,joined
+amount_spent,0,0.0,joined
+quarterly_arrivals,5510,44.6,joined
+spend_per_arrival,6397,51.7,joined
+quarter,0,0.0,joined
+year,0,0.0,joined
+covid_period,0,0.0,joined

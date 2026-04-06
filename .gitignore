@@ -5,7 +5,6 @@
 /__pycache__
 
 **/__pycache__/
-**/outputs/
 #for test generated csvs
 analysis/*.csv
 

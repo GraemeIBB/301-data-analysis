@@ -1,0 +1,5 @@
+stage,row_count,pct_of_province_rows
+Province-level spending rows (sub-regions excluded — confirmed duplicates),12365,100.0
+After excluding Overseas and Other countries (aggregate origin buckets),9656,78.1
+After excluding NULL or zero arrivals (suppressed visitor counts),5968,48.3
+After excluding < 20 quarterly arrivals (sparse pairs),5434,43.9
