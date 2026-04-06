@@ -1,5 +1,9 @@
 /data
 .env
+/data_load_and_clean/__pycache__
+/database/__pycache__
+/__pycache__
+
 **/__pycache__/
 **/outputs/
 #for test generated csvs
