@@ -4,6 +4,8 @@ from analysis.regression.regression import predict_quarterly_international_touri
 
 from analysis.eda.spend_per_arrival_eda import run_eda
 from analysis.spend_per_arrival_analysis import QuestionTwo
+from analysis.international_arrivals_share import QuestionOne
+from analysis.eda.Q1eda import run_eda as run_q1_eda
 
 def is_empty(table, cursor):
     sql = f"SELECT * FROM {table} LIMIT 10"
@@ -42,6 +44,12 @@ def main():
     #     insert_into_table4(cursor, provincial_visitor_count)
 
     # cnx.commit()
+
+    # Run Q1 analysis
+    q1 = QuestionOne()
+    q1.export()
+    q1.shift()
+    run_q1_eda()
 
     # Run Q2 analysis
     run_eda()
